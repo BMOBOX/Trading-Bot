@@ -2,6 +2,8 @@
 
 A Python CLI for placing Binance **USDT-M Futures** orders on Testnet.
 
+https://github.com/user-attachments/assets/7f761112-4956-44ec-872a-d459eaf71994
+
 It supports:
 - `BUY` / `SELL`
 - order types: `market`, `limit`, `stop-limit`
