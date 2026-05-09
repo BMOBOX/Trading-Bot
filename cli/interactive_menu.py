@@ -16,9 +16,9 @@ def interactive_menu():
         validate=validate_symbol_input_api,
     ).ask()
 
-    amount = float(
+    quantity = float(
         questionary.text(
-            "Amount:",
+            "Quantity:",
             validate=validate_positive_number_input,
         ).ask()
     )
@@ -54,7 +54,7 @@ def interactive_menu():
 
     actions[action](
         ticker=ticker,
-        amount=amount,
+        quantity=quantity,
         order_type=order_type,
         price=price,
         stop_price=stop_price,

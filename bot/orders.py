@@ -1,7 +1,8 @@
 from binance.exceptions import BinanceAPIException
-
+from requests.exceptions import Timeout, ConnectionError, RequestException
 from bot.client import BinanceConnect
-from utils.logger import logger
+from utils.logger import logger, api_logger
+
 
 client = BinanceConnect()
 
@@ -15,6 +16,7 @@ def _validate_side(side: str) -> str:
 
 def market_order(symbol: str, side: str, quantity: float) -> dict:
     side = _validate_side(side)
+    api_logger.info(f"REQUEST  futures_create_order | symbol={symbol} side={side} type=MARKET quantity={quantity}")
     try:
         order = client.futures_create_order(
             symbol=symbol.upper(),
@@ -25,9 +27,13 @@ def market_order(symbol: str, side: str, quantity: float) -> dict:
         logger.success(f"Market order placed successfully: {side} {quantity} {symbol.upper()}")
         return order
     except BinanceAPIException as e:
-        logger.error(f"Failed to place market order: {e}")
-        raise
-
+        logger.error(f"Binance rejected the order: {e.message}")
+    except Timeout:
+        logger.error("Request timed out — check your connection and try again")
+    except ConnectionError:
+        logger.error("Could not reach Binance — check your internet connection")
+    except RequestException as e:
+        logger.error(f"Network error: {e}")
 
 def limit_order(
     symbol: str,
@@ -37,6 +43,7 @@ def limit_order(
     time_in_force: str = "GTC",
 ) -> dict:
     side = _validate_side(side)
+    api_logger.info(f"REQUEST  futures_create_order | symbol={symbol} side={side} type=LIMIT quantity={quantity}")
     try:
         order = client.futures_create_order(
             symbol=symbol.upper(),
@@ -49,8 +56,13 @@ def limit_order(
         logger.success(f"Limit order placed successfully: {side} {quantity} {symbol.upper()} @ {price}")
         return order
     except BinanceAPIException as e:
-        logger.error(f"Failed to place limit order: {e}")
-        raise
+        logger.error(f"Binance rejected the order: {e.message}")
+    except Timeout:
+        logger.error("Request timed out — check your connection and try again")
+    except ConnectionError:
+        logger.error("Could not reach Binance — check your internet connection")
+    except RequestException as e:
+        logger.error(f"Network error: {e}")
 
 
 def stop_limit_order(
@@ -62,11 +74,12 @@ def stop_limit_order(
     time_in_force: str = "GTC",
 ) -> dict:
     side = _validate_side(side)
+    api_logger.info(f"REQUEST  futures_create_order | symbol={symbol} side={side} type=STOP_LIMIT quantity={quantity}")
     try:
         order = client.futures_create_order(
             symbol=symbol.upper(),
             side=side,
-            type="STOP_LOSS_LIMIT",
+            type="STOP",
             quantity=quantity,
             stopPrice=str(stop_price),
             price=str(limit_price),
@@ -78,5 +91,10 @@ def stop_limit_order(
         )
         return order
     except BinanceAPIException as e:
-        logger.error(f"Failed to place stop-limit order: {e}")
-        raise
+        logger.error(f"Binance rejected the order: {e.message}")
+    except Timeout:
+        logger.error("Request timed out — check your connection and try again")
+    except ConnectionError:
+        logger.error("Could not reach Binance — check your internet connection")
+    except RequestException as e:
+        logger.error(f"Network error: {e}")
