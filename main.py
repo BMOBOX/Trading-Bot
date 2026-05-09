@@ -1,26 +1,22 @@
-import asyncio
-from utils import logger
-from bot.client import BinanceConnect
+import typer
 
-async def main():
-    client = await BinanceConnect()
-    try:
+from cli import interactive_menu
+from cli.commands import buy, sell
 
-        order = await client.create_order(
-            symbol="BTCUSDT",
-            side="BUY",
-            type="MARKET",
-            quantity=0.001,
-        )
+app = typer.Typer(invoke_without_command=True)
 
-        print(order)
+app.command()(buy)
+app.command()(sell)
 
-    except Exception as e:
-        logger.exception(
-            f"Order failed: {e}"
-        )
 
-    await client.close_connection()
+@app.callback()
+def main(ctx: typer.Context):
+
+    if ctx.invoked_subcommand:
+        return
+
+    interactive_menu()
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    app()
