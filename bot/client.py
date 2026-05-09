@@ -14,6 +14,8 @@ if not api_key or not api_secret:
     logger.error("Binance API credentials missing. Check your .env file.")
     sys.exit(1)
 
+_client: Client | None = None
+
 def BinanceConnect() -> Client:
     """
     Establishes an authenticated sync connection to the Binance Testnet API.
@@ -29,20 +31,16 @@ def BinanceConnect() -> Client:
 
     """
 
-    client = None
-    try:
-        client = Client(
-            api_key,
-            api_secret,
-            testnet=True 
-        ) 
-        logger.info("Binance service connected")
-        return client
-
-    except BinanceAPIException as e:
-        logger.error(f"Binance API error (check key permissions or testnet keys): {e}")
-        raise
-
-    except Exception as e:
-        logger.exception(f"Failed to initialize Binance client: {e}")
-        raise
+    global _client
+    if _client is None:
+        try:
+            _client = Client(api_key, api_secret, testnet=True)
+            _client.FUTURES_URL = "https://testnet.binancefuture.com/fapi"
+            logger.info("Binance service connected")
+        except BinanceAPIException as e:
+            logger.error(f"Binance API error: {e}")
+            raise
+        except Exception as e:
+            logger.exception(f"Failed to initialize Binance client: {e}")
+            raise
+    return _client

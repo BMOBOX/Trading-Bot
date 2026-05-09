@@ -6,15 +6,23 @@ from utils.logger import logger
 client = BinanceConnect()
 
 
+def _validate_side(side: str) -> str:
+    side_upper = side.upper()
+    if side_upper not in {"BUY", "SELL"}:
+        raise ValueError("side must be either 'BUY' or 'SELL'")
+    return side_upper
+
+
 def market_order(symbol: str, side: str, quantity: float) -> dict:
+    side = _validate_side(side)
     try:
-        order = client.create_order(
+        order = client.futures_create_order(
             symbol=symbol.upper(),
             side=side,
             type="MARKET",
             quantity=quantity,
         )
-        logger.info(f"Market order placed: {side} {quantity} {symbol.upper()}")
+        logger.success(f"Market order placed successfully: {side} {quantity} {symbol.upper()}")
         return order
     except BinanceAPIException as e:
         logger.error(f"Failed to place market order: {e}")
@@ -30,7 +38,7 @@ def limit_order(
 ) -> dict:
     side = _validate_side(side)
     try:
-        order = client.create_order(
+        order = client.futures_create_order(
             symbol=symbol.upper(),
             side=side,
             type="LIMIT",
@@ -38,7 +46,7 @@ def limit_order(
             price=str(price),
             timeInForce=time_in_force,
         )
-        logger.info(f"Limit order placed: {side} {quantity} {symbol.upper()} @ {price}")
+        logger.success(f"Limit order placed successfully: {side} {quantity} {symbol.upper()} @ {price}")
         return order
     except BinanceAPIException as e:
         logger.error(f"Failed to place limit order: {e}")
@@ -55,7 +63,7 @@ def stop_limit_order(
 ) -> dict:
     side = _validate_side(side)
     try:
-        order = client.create_order(
+        order = client.futures_create_order(
             symbol=symbol.upper(),
             side=side,
             type="STOP_LOSS_LIMIT",
@@ -64,8 +72,8 @@ def stop_limit_order(
             price=str(limit_price),
             timeInForce=time_in_force,
         )
-        logger.info(
-            "Stop-limit order placed: "
+        logger.success(
+            "Stop-limit order placed successfully: "
             f"{side} {quantity} {symbol.upper()} stop {stop_price} limit {limit_price}"
         )
         return order
