@@ -56,7 +56,7 @@ def print_order_response(response: dict, side: str, symbol: str):
 
     if is_algo:
         refreshed = get_filled_algo_order(symbol, response["algoId"])
-    elif response.get("type") == "MARKET":
+    else:
         refreshed = get_filled_order(symbol, response["orderId"])
     
     order_printer(refreshed, side, symbol)

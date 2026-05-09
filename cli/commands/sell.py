@@ -8,6 +8,8 @@ from utils.validators import (
 )
 from utils import logger
 import typer
+from binance.exceptions import BinanceAPIException
+from requests.exceptions import Timeout, ConnectionError, RequestException
 
 
 def sell(
@@ -30,22 +32,10 @@ def sell(
             else None
         )
 
-        log_order_details(
-            "ORDER REQUEST",
-            {
-                "symbol": symbol,
-                "side": "SELL",
-                "type": normalized_order_type.upper(),
-                "quantity": quantity,
-                "price": parsed_price,
-                "stop price": parsed_stop_price,
-            },
-        )
-
-        if normalized_order_type == "market":
+        if normalized_order_type == "MARKET":
             response = market_order(symbol=symbol, side="SELL", quantity=quantity)
 
-        elif normalized_order_type == "limit":
+        elif normalized_order_type == "LIMIT":
             if price is None:
                 raise ValueError("price is required for limit orders")
             limit_price = parse_positive_float(price, "price")

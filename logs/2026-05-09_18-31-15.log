@@ -1,0 +1,4 @@
+2026-05-09 18:31:17 INFO     REQUEST  futures_create_order | symbol=BTCUSDT side=BUY type=MARKET quantity=0.01
+2026-05-09 18:31:18 INFO     RESPONSE futures_create_order | orderId=13123704421 status=NEW executedQty=0.0000 avgPrice=0.00
+2026-05-09 18:31:18 INFO     REQUEST  futures_get_order | orderId=13123704421 attempt=1
+2026-05-09 18:31:18 INFO     RESPONSE futures_get_order | orderId=13123704421 status=FILLED executedQty=0.0100 avgPrice=80348.400000

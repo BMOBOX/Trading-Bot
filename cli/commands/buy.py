@@ -8,6 +8,8 @@ from utils.validators import (
 )
 from utils import logger
 import typer
+from binance.exceptions import BinanceAPIException
+from requests.exceptions import Timeout, ConnectionError, RequestException
 
 def buy(
     ticker: str = typer.Argument(..., help="Trading pair e.g. BTCUSDT"),
